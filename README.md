@@ -1,1 +1,4 @@
-KUMAR
+### Contributors
+
+- Ashish Bind
+- Kumar Madagunaki

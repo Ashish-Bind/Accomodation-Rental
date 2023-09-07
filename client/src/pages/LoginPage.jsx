@@ -1,14 +1,34 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, Navigate } from 'react-router-dom'
+import axios from 'axios'
+import { useUser } from '../context/UserContext'
 
 function LoginPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [redirect, setRedirect] = useState(false)
+  const { setUser } = useUser()
 
-  return (
+  async function loginUser(e) {
+    e.preventDefault()
+    try {
+      const res = await axios.post(
+        '/login',
+        { email, password },
+        { withCredentials: true }
+      )
+      alert('Login Successful!')
+      setUser(res.data)
+      setRedirect(true)
+    } catch (error) {
+      alert('Login failed, Please try again!')
+    }
+  }
+
+  return !redirect ? (
     <div className="max-w-lg mx-auto mt-20">
       <h1 className="text-3xl text-center">Login</h1>
-      <form action="">
+      <form onSubmit={loginUser}>
         <input
           type="email"
           placeholder="example@email.com"
@@ -30,6 +50,8 @@ function LoginPage() {
         </div>
       </form>
     </div>
+  ) : (
+    <Navigate to="/" />
   )
 }
 

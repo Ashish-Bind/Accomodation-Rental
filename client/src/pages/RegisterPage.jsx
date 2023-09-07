@@ -9,7 +9,12 @@ function RegisterPage() {
 
   async function registerUser(e) {
     e.preventDefault()
-    axios.post('/register', { name, email, password })
+    try {
+      await axios.post('/register', { name, email, password })
+      alert('Registration Successful!')
+    } catch (error) {
+      alert('Registration failed, Please try again!')
+    }
   }
 
   return (
@@ -34,11 +39,11 @@ function RegisterPage() {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
-        <button className="primary">Login</button>
+        <button className="primary">Register</button>
         <div className="text-center py-2">
           Already have an account yet?{' '}
           <Link to="/login" className="underline text-black">
-            Register
+            Login
           </Link>
         </div>
       </form>

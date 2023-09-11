@@ -4,6 +4,7 @@ import mongoose from 'mongoose'
 import dotenv from 'dotenv'
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
+import cookieParser from 'cookie-parser'
 import UserModel from './models/userSchema.js'
 
 dotenv.config()
@@ -14,6 +15,7 @@ const jwtSecret = 'asfhxi1o2j2dsgnk24jaj7dfs12'
 
 app.use(express.urlencoded({ extended: true }))
 app.use(express.json())
+app.use(cookieParser())
 app.use(
   cors({
     credentials: true,
@@ -46,7 +48,7 @@ app.post('/login', async (req, res) => {
   if (user !== null) {
     if (bcrypt.compareSync(password, user.password)) {
       jwt.sign(
-        { email: user.email, id: user._id },
+        { email: user.email, id: user._id, name: user.name },
         jwtSecret,
         {},
         (error, token) => {
@@ -62,6 +64,19 @@ app.post('/login', async (req, res) => {
   }
 })
 
+app.get('/profile', (req, res) => {
+  const { token } = req.cookies
+  if (token) {
+    jwt.verify(token, jwtSecret, {}, async (error, userData) => {
+      if (error) {
+        throw error
+      }
+      res.json(userData)
+    })
+  }
+  res.json(null)
+})
+
 app.listen(3000, () => {
-  console.log(`Server started on port http://127.0.0.1:${3000}/`)
+  console.log(`Server started on port http://localhost:${3000}/`)
 })

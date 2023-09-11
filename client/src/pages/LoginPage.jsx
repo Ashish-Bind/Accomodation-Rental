@@ -12,11 +12,7 @@ function LoginPage() {
   async function loginUser(e) {
     e.preventDefault()
     try {
-      const res = await axios.post(
-        '/login',
-        { email, password },
-        { withCredentials: true }
-      )
+      const res = await axios.post('/login', { email, password })
       alert('Login Successful!')
       setUser(res.data)
       setRedirect(true)

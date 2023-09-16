@@ -5,7 +5,15 @@ import dotenv from 'dotenv'
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
 import cookieParser from 'cookie-parser'
+import imageDownloader from 'image-downloader'
 import UserModel from './models/userSchema.js'
+import { fileURLToPath } from 'url'
+import { dirname } from 'path'
+import multer from 'multer'
+import { renameSync } from 'fs'
+
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = dirname(__filename)
 
 dotenv.config()
 
@@ -14,6 +22,7 @@ const bcryptSalt = bcrypt.genSaltSync(10)
 const jwtSecret = 'asfhxi1o2j2dsgnk24jaj7dfs12'
 
 app.use(express.urlencoded({ extended: true }))
+app.use('/uploads', express.static(__dirname + '/uploads'))
 app.use(express.json())
 app.use(cookieParser())
 app.use(
@@ -75,6 +84,33 @@ app.get('/profile', (req, res) => {
     })
   }
   res.json(null)
+})
+
+/* app.post('/logout', (req, res) => {
+  res.cookie('token', '').json(true)
+}) */
+
+app.post('/upload-by-link', async (req, res) => {
+  const { link } = req.body
+  const newName = 'photo' + Date.now() + '.jpg'
+  await imageDownloader.image({
+    url: link,
+    dest: __dirname + '/uploads/' + newName,
+  })
+  res.json(newName)
+})
+
+const photMiddleware = multer({ dest: 'uploads' })
+app.post('/upload', photMiddleware.array('images', 100), (req, res) => {
+  const uploadedFiles = []
+  for (let i = 0; i < req.files.length; i++) {
+    const { path, originalname } = req.files[i]
+    const parts = originalname.split('.')
+    const newPath = path + '.' + parts[parts.length - 1]
+    renameSync(path, newPath)
+    uploadedFiles.push(newPath.replace(`uploads\\`, ''))
+  }
+  res.json(uploadedFiles)
 })
 
 app.listen(3000, () => {

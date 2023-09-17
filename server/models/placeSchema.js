@@ -1,7 +1,7 @@
-import mongoose from 'mongoose'
+import { Schema, model } from 'mongoose'
 
-const placeSchema = new mongoose.Schema({
-  owner: { type: mongoose.Schema.Types.ObjectId, ref: 'user' },
+const placeSchema = new Schema({
+  owner: { type: Schema.Types.ObjectId, ref: 'user' },
   title: String,
   address: String,
   photos: [String],
@@ -13,6 +13,6 @@ const placeSchema = new mongoose.Schema({
   maxGuest: Number,
 })
 
-const PlaceModel = mongoose.model('place', placeSchema)
+const PlaceModel = model('place', placeSchema)
 
 export default PlaceModel

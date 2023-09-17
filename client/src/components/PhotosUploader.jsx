@@ -1,7 +1,10 @@
 /* eslint-disable react/prop-types */
 import axios from 'axios'
+import { useState } from 'react'
 
-function PhotosUploader({ photoLink, addedPhotos, onChange, setPhotoLink }) {
+function PhotosUploader({ addedPhotos, onChange }) {
+  const [photoLink, setPhotoLink] = useState('')
+
   async function addImageByURL() {
     const { data: filename } = await axios.post('/upload-by-link', {
       link: photoLink,

@@ -7,6 +7,7 @@ import jwt from 'jsonwebtoken'
 import cookieParser from 'cookie-parser'
 import imageDownloader from 'image-downloader'
 import UserModel from './models/userSchema.js'
+import PlaceModel from './models/placeSchema.js'
 import { fileURLToPath } from 'url'
 import { dirname } from 'path'
 import multer from 'multer'
@@ -111,6 +112,51 @@ app.post('/upload', photMiddleware.array('images', 100), (req, res) => {
     uploadedFiles.push(newPath.replace(`uploads\\`, ''))
   }
   res.json(uploadedFiles)
+})
+
+app.post('/places', (req, res) => {
+  const { token } = req.cookies
+  const {
+    title,
+    address,
+    addedPhotos,
+    description,
+    perks,
+    extraInfo,
+    checkIn,
+    checkOut,
+    maxGuests,
+  } = req.body
+
+  jwt.verify(token, jwtSecret, {}, async (error, userData) => {
+    if (error) {
+      throw error
+    }
+    const placeDoc = await PlaceModel.create({
+      owner: userData.id,
+      title,
+      address,
+      photos: addedPhotos,
+      description,
+      perks,
+      extraInfo,
+      checkIn,
+      checkOut,
+      maxGuests,
+    })
+    res.json(placeDoc)
+  })
+})
+
+app.get('/places', (req, res) => {
+  const { token } = req.cookies
+  jwt.verify(token, jwtSecret, {}, async (err, userData) => {
+    if (err) {
+      throw err
+    }
+    const { id } = userData
+    res.json(await PlaceModel.find({ owner: id }))
+  })
 })
 
 app.listen(3000, () => {

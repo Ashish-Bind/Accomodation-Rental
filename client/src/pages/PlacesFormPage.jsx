@@ -1,13 +1,16 @@
 /* eslint-disable react/prop-types */
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import PhotosUploader from '../components/PhotosUploader'
 import axios from 'axios'
 import PerksLabel from '../components/PerksLabel'
 import AccountNav from '../components/AccountNav'
-import { Navigate } from 'react-router-dom'
+import { Navigate, useParams } from 'react-router-dom'
 
 function PlacesFormPage() {
   const classes = 'text-xl my-2 font-medium'
+
+  const { id } = useParams()
+
   const [title, setTitle] = useState('')
   const [address, setAddress] = useState('')
   const [addedPhotos, setAddedPhotos] = useState([])
@@ -18,21 +21,39 @@ function PlacesFormPage() {
   const [checkOut, setCheckOut] = useState('')
   const [maxGuests, setMaxGuests] = useState(1)
   const [redirect, setRedirect] = useState(false)
+  const [price, setPrice] = useState(2500)
 
-  async function addNewPlace(e) {
-    e.preventDefault()
-    const placeData = {
-      title,
-      address,
-      addedPhotos,
-      description,
-      perks,
-      extraInfo,
-      checkIn,
-      checkOut,
-      maxGuests,
+  useEffect(() => {
+    if (!id) {
+      return
     }
-    await axios.post('/places', placeData)
+
+    axios.get('/places/' + id).then((res) => {
+      const { data } = res
+      setTitle(data.title)
+      setAddress(data.address)
+      setAddedPhotos(data.photos)
+      setDescription(data.description)
+      setPerks(data.perks)
+      setExtraInfo(data.extraInfo)
+      setCheckIn(data.checkIn)
+      setCheckOut(data.checkOut)
+      setMaxGuests(data.maxGuests)
+      setPrice(data.price)
+    })
+  }, [id])
+
+  async function savePlace(e) {
+    e.preventDefault()
+    // prettier-ignore
+    const placeData = {title, address, addedPhotos, description, perks, extraInfo, checkIn, checkOut, maxGuests, price}
+    if (id) {
+      // update place
+      await axios.put('/places', { id, ...placeData })
+    } else {
+      // new place
+      await axios.post('/places', placeData)
+    }
     setRedirect(true)
   }
 
@@ -43,7 +64,7 @@ function PlacesFormPage() {
   return (
     <div>
       <AccountNav />
-      <form action="" onSubmit={addNewPlace}>
+      <form action="" onSubmit={savePlace}>
         <h2 className={classes}>Title</h2>
         <input
           type="text"
@@ -108,6 +129,13 @@ function PlacesFormPage() {
             />
           </div>
         </div>
+        <h2 className={classes}>Pricing</h2>
+        <p className="text-gray-500 text-sm">price per nights.</p>
+        <input
+          type="number"
+          value={price}
+          onChange={(e) => setPrice(e.target.value)}
+        />
         <div>
           <button className="primary ">Save</button>
         </div>

@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 function PerksLabel({ selected, onChange }) {
   const labelClass = 'flex border gap-2 p-4 align-center cursor-pointer'
 
@@ -14,7 +15,12 @@ function PerksLabel({ selected, onChange }) {
   return (
     <>
       <label className={labelClass}>
-        <input type="checkbox" name="wifi" onChange={handleCheck} />
+        <input
+          type="checkbox"
+          checked={selected.includes('wifi')}
+          name="wifi"
+          onChange={handleCheck}
+        />
         <svg
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
@@ -32,7 +38,12 @@ function PerksLabel({ selected, onChange }) {
         <span>Wifi</span>
       </label>
       <label className={labelClass}>
-        <input type="checkbox" name="parking" onChange={handleCheck} />
+        <input
+          type="checkbox"
+          checked={selected.includes('parking')}
+          name="parking"
+          onChange={handleCheck}
+        />
         <svg
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
@@ -50,7 +61,12 @@ function PerksLabel({ selected, onChange }) {
         <span>Free Parking Spot</span>
       </label>
       <label className={labelClass}>
-        <input type="checkbox" name="tv" onChange={handleCheck} />
+        <input
+          type="checkbox"
+          checked={selected.includes('tv')}
+          name="tv"
+          onChange={handleCheck}
+        />
         <svg
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
@@ -68,7 +84,12 @@ function PerksLabel({ selected, onChange }) {
         <span>TV</span>
       </label>
       <label className={labelClass}>
-        <input type="checkbox" name="pets" onChange={handleCheck} />
+        <input
+          type="checkbox"
+          checked={selected.includes('pets')}
+          name="pets"
+          onChange={handleCheck}
+        />
         <svg
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
@@ -86,7 +107,12 @@ function PerksLabel({ selected, onChange }) {
         <span>Pets</span>
       </label>
       <label className={labelClass}>
-        <input type="checkbox" name="private" onChange={handleCheck} />
+        <input
+          type="checkbox"
+          checked={selected.includes('private')}
+          name="private"
+          onChange={handleCheck}
+        />
         <svg
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
@@ -105,7 +131,12 @@ function PerksLabel({ selected, onChange }) {
         <span>Private Entrance</span>
       </label>
       <label className={labelClass}>
-        <input type="checkbox" name="long" onChange={handleCheck} />
+        <input
+          type="checkbox"
+          checked={selected.includes('long')}
+          name="long"
+          onChange={handleCheck}
+        />
         <svg
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
@@ -124,7 +155,12 @@ function PerksLabel({ selected, onChange }) {
         <span>Long Term Stay</span>
       </label>
       <label className={labelClass}>
-        <input type="checkbox" name="kitchen" onChange={handleCheck} />
+        <input
+          type="checkbox"
+          checked={selected.includes('kitchen')}
+          name="kitchen"
+          onChange={handleCheck}
+        />
         <svg
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
@@ -148,7 +184,12 @@ function PerksLabel({ selected, onChange }) {
         <span>Kitchen</span>
       </label>
       <label className={labelClass}>
-        <input type="checkbox" name="garden" onChange={handleCheck} />
+        <input
+          type="checkbox"
+          checked={selected.includes('garden')}
+          name="garden"
+          onChange={handleCheck}
+        />
         <svg
           xmlns="http://www.w3.org/2000/svg"
           fill="none"

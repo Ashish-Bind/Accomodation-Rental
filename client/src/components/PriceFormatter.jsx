@@ -4,7 +4,7 @@ function PriceFormatter({ price }) {
     currency: 'INR',
     maximumFractionDigits: 2,
   }).format(price)
-  return <span className="font-semibold text-base">{formattedPrice}</span>
+  return <span className="font-medium text-base">{formattedPrice}</span>
 }
 
 export default PriceFormatter

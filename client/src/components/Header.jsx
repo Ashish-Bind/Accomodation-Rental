@@ -3,6 +3,8 @@ import { useUser } from '../context/UserContext'
 
 function Header() {
   const { user } = useUser()
+  const username =
+    user?.name?.[0].toUpperCase() + user?.name?.slice(1, user.name.length)
   return (
     <div>
       <header className="flex justify-between">
@@ -21,7 +23,9 @@ function Header() {
               d="M21 16.811c0 .864-.933 1.405-1.683.977l-7.108-4.062a1.125 1.125 0 010-1.953l7.108-4.062A1.125 1.125 0 0121 8.688v8.123zM11.25 16.811c0 .864-.933 1.405-1.683.977l-7.108-4.062a1.125 1.125 0 010-1.953L9.567 7.71a1.125 1.125 0 011.683.977v8.123z"
             />
           </svg>
-          <span className="font-bold text-xl">StayWise</span>
+          <span className="font-semibold text-2xl">
+            Stay<span className="font-extralight">Wise</span>
+          </span>
         </Link>
 
         <div className="flex gap-2 border items-center border-gray-300 rounded-full py-2 px-4 shadow-md shadow-gray-300">
@@ -45,7 +49,7 @@ function Header() {
         </div>
 
         <Link to={user ? '/account' : '/login'}>
-          <div className="flex gap-2 border items-center border-gray-300 rounded-full shadow-md shadow-gray-300 p-2">
+          <div className="flex gap-1 border items-center border-gray-300 rounded-full shadow-md shadow-gray-300 p-2">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
@@ -60,12 +64,7 @@ function Header() {
                 d="M17.982 18.725A7.488 7.488 0 0012 15.75a7.488 7.488 0 00-5.982 2.975m11.963 0a9 9 0 10-11.963 0m11.963 0A8.966 8.966 0 0112 21a8.966 8.966 0 01-5.982-2.275M15 9.75a3 3 0 11-6 0 3 3 0 016 0z"
               />
             </svg>
-            {user && (
-              <div>
-                {user.name[0].toUpperCase() +
-                  user.name.slice(1, user.name.length)}
-              </div>
-            )}
+            {user && <div className="font-semibold mr-2">{username}</div>}
           </div>
         </Link>
       </header>

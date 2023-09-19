@@ -2,12 +2,17 @@ import { Link } from 'react-router-dom'
 import AccountNav from '../components/AccountNav'
 import { useEffect, useState } from 'react'
 import axios from 'axios'
+import Loading from '../icons/Loading'
 
 function PlacesPage() {
   const [places, setPlaces] = useState([])
+  const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    axios.get('/user-places').then(({ data }) => setPlaces(data))
+    axios.get('/user-places').then(({ data }) => {
+      setPlaces(data)
+      setIsLoading(false)
+    })
   }, [])
 
   return (
@@ -36,30 +41,39 @@ function PlacesPage() {
         </Link>
       </div>
       <div className="m-2">
-        {places.length > 0 &&
+        {isLoading === true ? (
+          <div className="w-24 h-24 mx-auto">
+            <Loading />
+          </div>
+        ) : places.length > 0 ? (
           places.map((place) => {
             return (
               <Link
                 to={`/account/places/${place._id}`}
                 key={place._id}
-                className="flex bg-gray-100 p-4 gap-2 rounded-lg shadow-2xl"
+                className="flex bg-gray-200 p-4 gap-2 rounded-lg hover:shadow-xl my-6"
               >
-                <div className="w-44 grow shrink-0">
+                <div className="flex w-44 grow shrink-0">
                   {place.photos.length > 0 && (
                     <img
-                      className="object-center rounded-lg"
+                      className="object-center object-cover rounded-lg"
                       src={`http://localhost:3000/uploads/${place.photos[0]}`}
                       alt=""
                     />
                   )}
                 </div>
-                <div className="flex flex-col justify-between p-4 gap-2">
+                <div className="flex flex-col justify-between p-2 gap-2">
                   <h2 className="text-2xl font-medium">{place.title}</h2>
-                  <p className="text-sm">{place.description}</p>
+                  <p className="text-sm">
+                    {place.description.slice(0, 450) + '...'}
+                  </p>
                 </div>
               </Link>
             )
-          })}
+          })
+        ) : (
+          <div>No Listing found</div>
+        )}
       </div>
     </div>
   )

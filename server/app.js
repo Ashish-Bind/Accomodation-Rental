@@ -189,6 +189,11 @@ app.get('/all-places', async (req, res) => {
   res.json(await PlaceModel.find())
 })
 
+app.get('/place/:id', async (req, res) => {
+  const { id } = req.params
+  res.json(await PlaceModel.findById(id))
+})
+
 app.listen(3000, () => {
   console.log(`Server started on port http://localhost:${3000}/`)
 })

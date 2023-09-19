@@ -5,7 +5,10 @@ const PlaceContext = createContext()
 
 export const usePlace = () => useContext(PlaceContext)
 
-const initialState = []
+const initialState = {
+  allPlaces: [],
+  singlePlace: {},
+}
 
 function PlaceProvider({ children }) {
   const [state, dispatch] = useReducer(placeReducer, initialState)
@@ -14,8 +17,12 @@ function PlaceProvider({ children }) {
     dispatch({ type: ACTIONS_PLACES.GET_ALL_PLACES, payload: data })
   }
 
+  const setSinglePlace = (data) => {
+    dispatch({ type: ACTIONS_PLACES.SET_SINGLE_PLACES, payload: data })
+  }
+
   return (
-    <PlaceContext.Provider value={{ state, getAllPlaces }}>
+    <PlaceContext.Provider value={{ ...state, getAllPlaces, setSinglePlace }}>
       {children}
     </PlaceContext.Provider>
   )

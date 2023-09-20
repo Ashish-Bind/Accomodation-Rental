@@ -3,7 +3,7 @@ import Header from './components/Header'
 
 function Layout() {
   return (
-    <div className="p-4 mx-10">
+    <div className="lg:p-4  p-2 mx-1 lg:mx-10">
       <Header />
       <Outlet />
     </div>

@@ -51,7 +51,7 @@ function PlacesPage() {
               <Link
                 to={`/account/places/${place._id}`}
                 key={place._id}
-                className="flex bg-gray-200 p-4 gap-2 rounded-lg hover:shadow-xl my-6"
+                className="flex border border-gray-300 p-2 gap-2 rounded-lg hover:shadow-xl my-6"
               >
                 <div className="flex w-44 grow shrink-0">
                   {place.photos.length > 0 && (

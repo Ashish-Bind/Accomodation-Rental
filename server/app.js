@@ -83,8 +83,9 @@ app.get('/profile', (req, res) => {
       }
       res.json(userData)
     })
+  } else {
+    res.json(null)
   }
-  res.json(null)
 })
 
 /* app.post('/logout', (req, res) => {
@@ -189,9 +190,10 @@ app.get('/all-places', async (req, res) => {
   res.json(await PlaceModel.find())
 })
 
-app.get('/place/:id', async (req, res) => {
+app.get('/single-place/:id', async (req, res) => {
   const { id } = req.params
-  res.json(await PlaceModel.findById(id))
+  const foundPlace = await PlaceModel.findById(id)
+  res.json(foundPlace)
 })
 
 app.listen(3000, () => {

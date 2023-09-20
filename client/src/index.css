@@ -28,3 +28,7 @@ button {
 button.primary {
   @apply px-4 py-2 w-full rounded-md text-white text-xl;
 }
+
+input[data-search='true'] {
+  @apply sm:w-[110px] w-[70px] m-0 p-0 ml-1;
+}

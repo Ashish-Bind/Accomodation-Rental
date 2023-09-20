@@ -5,18 +5,18 @@ import { usePlace } from '../context/PlacesContext'
 
 function SinglePlacePage() {
   const { id } = useParams()
-  const { singlePlace, setSinglePlace } = usePlace()
+  const { singlePlace: place, setSinglePlace } = usePlace()
 
   useEffect(() => {
     if (!id) {
       return
     }
-    axios.get('/places/' + id).then((res) => {
+    axios.get('/single-place/' + id).then((res) => {
       setSinglePlace(res.data)
     })
   }, [id])
 
-  return <div>SinglePlacePage</div>
+  return <div>{place.title}</div>
 }
 
 export default SinglePlacePage

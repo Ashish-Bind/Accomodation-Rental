@@ -1,4 +1,5 @@
-import { createContext, useContext, useReducer } from 'react'
+/* eslint-disable react/prop-types */
+import { createContext, useContext, useEffect, useReducer } from 'react'
 import { ACTIONS_PLACES, placeReducer } from './reducers/placeReducer'
 
 const PlaceContext = createContext()
@@ -8,6 +9,10 @@ export const usePlace = () => useContext(PlaceContext)
 const initialState = {
   allPlaces: [],
   singlePlace: {},
+  filteredPlaces: [],
+  filters: {
+    search: '',
+  },
 }
 
 function PlaceProvider({ children }) {
@@ -21,8 +26,21 @@ function PlaceProvider({ children }) {
     dispatch({ type: ACTIONS_PLACES.SET_SINGLE_PLACES, payload: data })
   }
 
+  const updateFilterValue = (e) => {
+    dispatch({
+      type: ACTIONS_PLACES.SET_FILTER_VALUE,
+      payload: { name: e.target.name, value: e.target.value },
+    })
+  }
+
+  useEffect(() => {
+    dispatch({ type: ACTIONS_PLACES.FILTER_ITEMS })
+  }, [state.filters])
+
   return (
-    <PlaceContext.Provider value={{ ...state, getAllPlaces, setSinglePlace }}>
+    <PlaceContext.Provider
+      value={{ ...state, getAllPlaces, setSinglePlace, updateFilterValue }}
+    >
       {children}
     </PlaceContext.Provider>
   )

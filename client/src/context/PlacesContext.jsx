@@ -13,6 +13,7 @@ const initialState = {
   filters: {
     search: '',
   },
+  searchBox: false,
 }
 
 function PlaceProvider({ children }) {
@@ -33,13 +34,23 @@ function PlaceProvider({ children }) {
     })
   }
 
+  const setSearchBox = () => {
+    dispatch({ type: ACTIONS_PLACES.SET_SEARCH_BOX })
+  }
+
   useEffect(() => {
     dispatch({ type: ACTIONS_PLACES.FILTER_ITEMS })
   }, [state.filters])
 
   return (
     <PlaceContext.Provider
-      value={{ ...state, getAllPlaces, setSinglePlace, updateFilterValue }}
+      value={{
+        ...state,
+        getAllPlaces,
+        setSinglePlace,
+        updateFilterValue,
+        setSearchBox,
+      }}
     >
       {children}
     </PlaceContext.Provider>

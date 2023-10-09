@@ -6,12 +6,13 @@ import { Link } from 'react-router-dom'
 import NotFound from '../icons/NotFound'
 
 function HomePage() {
-  const { filteredPlaces, getAllPlaces } = usePlace()
+  const { filteredPlaces, getAllPlaces, setSearchBox } = usePlace()
 
   useEffect(() => {
     axios.get('/all-places').then((res) => {
       getAllPlaces([...res.data])
     })
+    setSearchBox()
   }, [])
 
   return filteredPlaces.length > 0 ? (

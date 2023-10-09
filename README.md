@@ -1,8 +1,10 @@
-### Contributors
+# Contributors
 
 - Ashish Bind
 - Kumar Madagunaki
 - Om Behra
 - Khan Affan
 
-Accomodation Rental
+---
+
+> Accomodation Rental

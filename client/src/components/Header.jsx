@@ -4,7 +4,7 @@ import { usePlace } from '../context/PlacesContext'
 
 function Header() {
   const { user } = useUser()
-  const { filters, updateFilterValue } = usePlace()
+  const { filters, updateFilterValue, searchBox } = usePlace()
   const username =
     user?.name?.[0].toUpperCase() + user?.name?.slice(1, user.name.length)
   return (
@@ -30,37 +30,40 @@ function Header() {
           </span>
         </Link>
 
-        <div className="flex gap-0 border items-center border-gray-300 rounded-full p-2 shadow-md shadow-gray-300">
-          <input
-            id="searchInput"
-            type="text"
-            data-search="true"
-            placeholder="Any Location"
-            onChange={updateFilterValue}
-            name="search"
-            value={filters.search}
-            className="border-none outline-none cursor-default"
-          />
-          <label
-            className="bg-primary text-white p-2 rounded-full cursor-pointer"
-            htmlFor="searchInput"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={3}
-              stroke="currentColor"
-              className="w-4 h-4"
+        {searchBox && (
+          <div className="flex gap-0 border items-center border-gray-300 rounded-full p-2 shadow-md shadow-gray-300">
+            <input
+              id="searchInput"
+              type="text"
+              data-search="true"
+              placeholder="Any Location"
+              onChange={updateFilterValue}
+              name="search"
+              autoComplete="off"
+              value={filters.search}
+              className="border-none outline-none cursor-default"
+            />
+            <label
+              className="bg-primary text-white p-2 rounded-full cursor-pointer"
+              htmlFor="searchInput"
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
-              />
-            </svg>
-          </label>
-        </div>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={3}
+                stroke="currentColor"
+                className="w-4 h-4"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
+                />
+              </svg>
+            </label>
+          </div>
+        )}
 
         <Link to={user ? '/account' : '/login'}>
           <div className="flex gap-1 border items-center border-gray-300 rounded-full shadow-md shadow-gray-300 p-2">

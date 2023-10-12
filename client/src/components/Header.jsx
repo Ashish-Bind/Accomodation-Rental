@@ -1,12 +1,16 @@
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import { useUser } from '../context/UserContext'
 import { usePlace } from '../context/PlacesContext'
 
 function Header() {
   const { user } = useUser()
-  const { filters, updateFilterValue, searchBox } = usePlace()
+  const { filters, updateFilterValue } = usePlace()
+
   const username =
     user?.name?.[0].toUpperCase() + user?.name?.slice(1, user.name.length)
+
+  const location = useLocation()
+
   return (
     <div>
       <header className="flex justify-between">
@@ -30,7 +34,7 @@ function Header() {
           </span>
         </Link>
 
-        {searchBox && (
+        {location.pathname === '/' && (
           <div className="flex gap-0 border items-center border-gray-300 rounded-full p-2 shadow-md shadow-gray-300">
             <input
               id="searchInput"

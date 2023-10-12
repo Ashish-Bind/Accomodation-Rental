@@ -3,7 +3,6 @@ export const ACTIONS_PLACES = {
   SET_SINGLE_PLACES: 'set-single-place',
   SET_FILTER_VALUE: 'set-filter-value',
   FILTER_ITEMS: 'filter-items',
-  SET_SEARCH_BOX: 'set-search-box',
 }
 
 export const placeReducer = (state, { type, payload }) => {
@@ -41,10 +40,6 @@ export const placeReducer = (state, { type, payload }) => {
         })
       }
       return { ...state, filteredPlaces: tempPlaces }
-    }
-
-    case ACTIONS_PLACES.SET_SEARCH_BOX: {
-      return { ...state, searchBox: true }
     }
 
     default: {

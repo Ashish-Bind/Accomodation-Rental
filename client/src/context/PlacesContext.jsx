@@ -13,7 +13,6 @@ const initialState = {
   filters: {
     search: '',
   },
-  searchBox: false,
 }
 
 function PlaceProvider({ children }) {
@@ -34,10 +33,6 @@ function PlaceProvider({ children }) {
     })
   }
 
-  const setSearchBox = () => {
-    dispatch({ type: ACTIONS_PLACES.SET_SEARCH_BOX })
-  }
-
   useEffect(() => {
     dispatch({ type: ACTIONS_PLACES.FILTER_ITEMS })
   }, [state.filters])
@@ -49,7 +44,6 @@ function PlaceProvider({ children }) {
         getAllPlaces,
         setSinglePlace,
         updateFilterValue,
-        setSearchBox,
       }}
     >
       {children}

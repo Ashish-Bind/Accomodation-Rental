@@ -8,10 +8,12 @@ import cookieParser from 'cookie-parser'
 import imageDownloader from 'image-downloader'
 import UserModel from './models/userSchema.js'
 import PlaceModel from './models/placeSchema.js'
+import BookingModel from './models/bookingSchema.js'
 import { fileURLToPath } from 'url'
 import { dirname } from 'path'
 import multer from 'multer'
 import { renameSync } from 'fs'
+import bookingModel from './models/bookingSchema.js'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
@@ -170,7 +172,7 @@ app.get('/places/:id', async (req, res) => {
 
 app.put('/places', async (req, res) => {
   // prettier-ignore
-  const { id, title, address, addedPhotos, description, perks, extraInfo, checkIn, checkOut, maxGuests, price } = req.body
+  const { id, title, address, addedPhotos, description, perks, extraInfo, checkIn, checkOut, maxGuests:maxGuest, price } = req.body
   const { token } = req.cookies
   jwt.verify(token, jwtSecret, {}, async (err, userData) => {
     const placeDoc = await PlaceModel.findById(id)
@@ -179,7 +181,7 @@ app.put('/places', async (req, res) => {
     }
     if (userData.id === placeDoc.owner.toString()) {
       // prettier-ignore
-      placeDoc.set({ title, address, photos : addedPhotos, description, perks, extraInfo, checkIn, checkOut, maxGuests, price})
+      placeDoc.set({ title, address, photos : addedPhotos, description, perks, extraInfo, checkIn, checkOut, maxGuest, price})
       await placeDoc.save()
       res.json('ok')
     }
@@ -194,6 +196,23 @@ app.get('/single-place/:id', async (req, res) => {
   const { id } = req.params
   const foundPlace = await PlaceModel.findById(id)
   res.json(foundPlace)
+})
+
+app.post('/booking', async (req, res) => {
+  const { placeId, checkIn, checkOut, numGuest, fullName, mobile, totalPrice } =
+    req.body
+
+  const bookingDoc = await bookingModel.create({
+    place: placeId,
+    checkIn,
+    checkOut,
+    maxGuest: numGuest,
+    name: fullName,
+    mobile,
+    totalPrice,
+  })
+
+  res.json(bookingDoc)
 })
 
 app.listen(3000, () => {

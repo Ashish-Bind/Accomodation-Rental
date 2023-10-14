@@ -111,7 +111,7 @@ function SingleBookingPage() {
             <Loading color={'#fff'} />
           </div>
         ) : (
-          <div className="my-2 mx-4 mx-auto">Cancel Booking</div>
+          <div className="my-2mx-auto">Cancel Booking</div>
         )}
       </button>
     </div>

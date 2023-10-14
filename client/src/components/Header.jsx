@@ -40,7 +40,7 @@ function Header() {
               id="searchInput"
               type="text"
               data-search="true"
-              placeholder="Any Location"
+              placeholder="Lonavala"
               onChange={updateFilterValue}
               name="search"
               autoComplete="off"

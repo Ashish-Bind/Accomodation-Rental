@@ -3,6 +3,8 @@ import AccountNav from '../components/AccountNav'
 import { useEffect, useState } from 'react'
 import axios from 'axios'
 import Loading from '../icons/Loading'
+import { Map, Money } from '../icons/Icons'
+import PriceFormatter from '../components/PriceFormatter'
 
 function PlacesPage() {
   const [places, setPlaces] = useState([])
@@ -53,7 +55,7 @@ function PlacesPage() {
                 key={place._id}
                 className="flex border border-gray-300 p-2 gap-2 rounded-lg hover:shadow-xl my-6"
               >
-                <div className="flex w-44 grow shrink-0">
+                <div className="grid lg:grid-cols-[15%_85%] grid-cols-1">
                   {place.photos.length > 0 && (
                     <img
                       className="object-center object-cover rounded-lg"
@@ -61,18 +63,24 @@ function PlacesPage() {
                       alt=""
                     />
                   )}
-                </div>
-                <div className="flex flex-col justify-between p-2 gap-2">
-                  <h2 className="text-2xl font-medium">{place.title}</h2>
-                  <p className="text-sm">
-                    {place.description.slice(0, 450) + '...'}
-                  </p>
+                  <div className="flex flex-col justify-between ml-4 gap-1">
+                    <h2 className="text-2xl font-medium">{place.title}</h2>
+                    <p className="flex gap-1 font-semibold">
+                      <Map /> {place.address}
+                    </p>
+                    <p className="text-sm text-gray-400">
+                      {place.description.slice(0, 250) + '...'}
+                    </p>
+                    <p className="flex gap-1 font-semibold">
+                      <Money /> <PriceFormatter price={place.price} />
+                    </p>
+                  </div>
                 </div>
               </Link>
             )
           })
         ) : (
-          <div>No Listing found</div>
+          <div className="text-center">No Listing found</div>
         )}
       </div>
     </div>

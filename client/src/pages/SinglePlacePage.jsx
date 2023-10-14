@@ -69,6 +69,22 @@ function SinglePlacePage() {
   }
 
   async function bookPlace() {
+    if (!user) {
+      setRedirect('/login')
+      return
+    }
+
+    if (
+      !checkIn ||
+      !checkOut ||
+      !numGuest ||
+      !fullName ||
+      !mobile ||
+      !totalPrice
+    ) {
+      return
+    }
+
     setLoading(true)
     const response = await axios.post('/booking', {
       placeId: id,
@@ -86,8 +102,8 @@ function SinglePlacePage() {
   }
 
   async function cancelBooking() {
-    axios.post('/cancel-booking', { id: user.id, placeId: id })
-    setRedirect('/')
+    await axios.post('/cancel-booking', { id: user.id, placeId: id })
+    setRedirect('/account/bookings')
   }
 
   if (redirect) {
@@ -107,16 +123,20 @@ function SinglePlacePage() {
         {place.address}
       </a>
       <div className="grid lg:grid-cols-2 grid-cols-1 gap-2 rounded mt-2 relative">
-        <img
-          src={'http://localhost:3000/uploads/' + place.photos?.[0]}
-          onClick={() => setShowAllPhotos(true)}
-          className="aspect-auto object-cover rounded-2xl cursor-pointer"
-        />
-        <img
-          src={'http://localhost:3000/uploads/' + place.photos?.[1]}
-          onClick={() => setShowAllPhotos(true)}
-          className="aspect-auto object-cover rounded-2xl cursor-pointer"
-        />
+        <div className="flex object-cover w-full">
+          <img
+            src={'http://localhost:3000/uploads/' + place.photos?.[0]}
+            onClick={() => setShowAllPhotos(true)}
+            className="rounded-2xl cursor-pointer object-cover"
+          />
+        </div>
+        <div className="flex ">
+          <img
+            src={'http://localhost:3000/uploads/' + place.photos?.[1]}
+            onClick={() => setShowAllPhotos(true)}
+            className=" object-cover rounded-2xl cursor-pointer"
+          />
+        </div>
         <button
           className="absolute right-4 bottom-4 px-2 py-2  rounded-md font-semibold flex items-center gap-2 text-white"
           onClick={() => setShowAllPhotos(true)}
@@ -126,11 +146,11 @@ function SinglePlacePage() {
         </button>
       </div>
 
-      <div className="grid lg:grid-cols-[2fr_1fr]  grid-cols-1 gap-2 mt-4">
+      <div className="grid lg:grid-cols-1 grid-cols-1 gap-2 mt-4">
         <div className="grid content-around">
           <div>
             <h2 className="font-semibold underline text-lg">Description</h2>
-            <p className="text-gray-500 text-base break-all">
+            <p className="text-gray-400 text-base break-all">
               {place.description}
             </p>
           </div>
@@ -150,14 +170,16 @@ function SinglePlacePage() {
           </div>
         </div>
         {loading ? (
-          <div className="w-40 place-self-center text-primary">
-            <Loading />
+          <div className="w-full place-self-center text-primary border border-gray-300 text-center rounded-md pb-4">
+            <div className="w-40 mx-auto">
+              <Loading />
+            </div>
             <h1>Please do not refresh the page.</h1>
           </div>
         ) : (
-          <div className=" py-2 px-4 rounded-md shadow-2xl place-items-center">
+          <div className=" py-2 px-4 rounded-md border border-gray-300 place-items-center">
             {place.booked ? (
-              place.bookedBy === user.id ? (
+              place.bookedBy === user?.id ? (
                 <button
                   className="px-2 py-1 w-full rounded-xl text-white text-base my-2"
                   onClick={cancelBooking}
@@ -167,6 +189,10 @@ function SinglePlacePage() {
               ) : (
                 <div>Already booked by someone</div>
               )
+            ) : user?.id === place.owner ? (
+              <div className="text-primary font-bold text-center">
+                You are the owner of this Accommodation
+              </div>
             ) : (
               <>
                 <div className="text-center">
@@ -262,7 +288,7 @@ function SinglePlacePage() {
         )}
       </div>
       <p className="font-semibold underline text-lg">Extra Information:</p>
-      <p className="text-gray-500 text-sm break-all">{place.extraInfo}</p>
+      <p className="text-gray-400 text-base break-all">{place.extraInfo}</p>
     </div>
   )
 }

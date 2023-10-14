@@ -8,7 +8,7 @@ function AccountNav() {
   }
 
   function LinkClasses(type) {
-    let classes = 'inline-flex gap-1 py-2 px-6 rounded-full '
+    let classes = 'inline-flex gap-1 py-2 px-6 rounded-full w-50 '
     if (type === subpage) {
       classes += 'bg-primary text-white '
     } else {
@@ -18,7 +18,7 @@ function AccountNav() {
   }
 
   return (
-    <nav className="w-full flex justify-center mt-8 gap-2 mb-8">
+    <nav className="w-full flex lg:justify-center mt-8 gap-2 mb-8 lg:flex-row  w- flex-col text-center items-center">
       <Link className={LinkClasses('profile')} to={'/account'}>
         <svg
           xmlns="http://www.w3.org/2000/svg"

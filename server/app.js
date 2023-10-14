@@ -288,8 +288,10 @@ app.post('/booking', async (req, res) => {
     `,
   })
 
+  console.log('Booking Log')
   console.log('Message sent: %s', info1.messageId)
   console.log('Message sent: %s', info2.messageId)
+  console.log('--------------')
 
   res.json(bookingDoc)
 })
@@ -348,15 +350,80 @@ app.post('/cancel-booking', async (req, res) => {
     `,
   })
 
+  console.log('Cancellation Log')
+  console.log('Message sent: %s', info1.messageId)
+  console.log('Message sent: %s', info2.messageId)
+  console.log('--------------')
+
   res.json({ cancelledPlace, hostInfo, user })
 })
 
 app.get('/bookings', async (req, res) => {
   const userData = await getUserFromToken(req)
-  const foundBookings = await BookingModel.findOne({ bookedUser: userData.id })
-  const hostedUser = await PlaceModel.findById(foundBookings.place)
+  const foundBookings = await BookingModel.find({
+    bookedUser: userData.id,
+  }).populate('place')
 
   res.json(foundBookings)
+})
+
+app.post('/cancel-booking/single', async (req, res) => {
+  const user = await getUserFromToken(req)
+  const { id, placeId } = req.body
+  const bookedPlace = await BookingModel.findByIdAndDelete(placeId)
+  const cancelledPlace = await PlaceModel.findByIdAndUpdate(bookedPlace.place, {
+    booked: false,
+    bookedBy: null,
+  })
+  const hostInfo = await UserModel.findById(cancelledPlace.owner)
+
+  const transport = nodemailer.createTransport({
+    host: 'sandbox.smtp.mailtrap.io',
+    port: 2525,
+    auth: {
+      user: '666e7dd8d7f675',
+      pass: 'b5e636d1a8c0a6',
+    },
+  })
+
+  const info1 = await transport.sendMail({
+    from: '"StayWise 🏢" <business@staywise.com>',
+    to: user.email,
+    subject: 'Accomodation cancelled Successfully',
+    html: `
+      <h1>Your booking is Cancelled</h1>
+      <p>Apartment <i><b>${cancelledPlace.title}</b></i> cancelled successfully</p>
+      <p>You can contact the owner for further to update them</p>
+      <ul>
+        <li>Name: ${hostInfo.name}</li>
+        <li>Email: ${hostInfo.email}</li>
+        </ul>
+      <hr>
+    `,
+  })
+
+  const info2 = await transport.sendMail({
+    from: '"StayWise 🏢" <business@staywise.com>',
+    to: hostInfo.email,
+    subject: 'Your Accomodation is Cancelled',
+    html: `
+      <h1>Your Accomodation is cancelled by <u>${user.name}</u></h1>
+      <p>Cancelled apartment <i><b>${cancelledPlace.title}</b></i> successfully</p>
+      <hr>
+      <p>Please enquire with renter for any issue</p>
+      <ul>
+        <li>Name: <b>${user.name}</b></li>
+        <li>Email: <b>${user.email}</b></li>
+      </ul>
+    `,
+  })
+
+  console.log('Cancellation Log')
+  console.log('Message sent: %s', info1.messageId)
+  console.log('Message sent: %s', info2.messageId)
+  console.log('--------------')
+
+  res.json({ cancelledPlace, hostInfo, user })
 })
 
 app.listen(3000, () => {

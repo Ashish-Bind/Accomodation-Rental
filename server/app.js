@@ -6,11 +6,12 @@ import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
 import cookieParser from 'cookie-parser'
 import imageDownloader from 'image-downloader'
+import nodemailer from 'nodemailer'
 import UserModel from './models/userSchema.js'
 import PlaceModel from './models/placeSchema.js'
 import BookingModel from './models/bookingSchema.js'
 import { fileURLToPath } from 'url'
-import { dirname } from 'path'
+import { dirname, resolve } from 'path'
 import multer from 'multer'
 import { renameSync } from 'fs'
 import bookingModel from './models/bookingSchema.js'
@@ -23,6 +24,14 @@ dotenv.config()
 const app = express()
 const bcryptSalt = bcrypt.genSaltSync(10)
 const jwtSecret = 'asfhxi1o2j2dsgnk24jaj7dfs12'
+function getUserFromToken(req) {
+  return new Promise((resolve, reject) => {
+    jwt.verify(req.cookies.token, jwtSecret, async (err, userData) => {
+      if (err) reject(err)
+      resolve(userData)
+    })
+  })
+}
 
 app.use(express.urlencoded({ extended: true }))
 app.use('/uploads', express.static(__dirname + '/uploads'))
@@ -69,10 +78,10 @@ app.post('/login', async (req, res) => {
         }
       )
     } else {
-      res.json('pass no')
+      throw new Error('Wrong Password')
     }
   } else {
-    res.json('No user found')
+    throw new Error('No user found')
   }
 })
 
@@ -199,8 +208,18 @@ app.get('/single-place/:id', async (req, res) => {
 })
 
 app.post('/booking', async (req, res) => {
+  const user = await getUserFromToken(req)
   const { placeId, checkIn, checkOut, numGuest, fullName, mobile, totalPrice } =
     req.body
+
+  const transport = nodemailer.createTransport({
+    host: 'sandbox.smtp.mailtrap.io',
+    port: 2525,
+    auth: {
+      user: '666e7dd8d7f675',
+      pass: 'b5e636d1a8c0a6',
+    },
+  })
 
   const bookingDoc = await bookingModel.create({
     place: placeId,
@@ -210,9 +229,134 @@ app.post('/booking', async (req, res) => {
     name: fullName,
     mobile,
     totalPrice,
+    bookedUser: user.id,
   })
 
+  const bookedAccomodation = await PlaceModel.findByIdAndUpdate(
+    bookingDoc.place,
+    {
+      booked: true,
+      bookedBy: user.id,
+    }
+  )
+  const hostInfo = await UserModel.findById(bookedAccomodation.owner)
+
+  const info1 = await transport.sendMail({
+    from: '"StayWise 🏢" <business@staywise.com>',
+    to: user.email,
+    subject: 'Accomodation booked Successfully',
+    html: `
+      <h1>Your booking is Successful</h1>
+      <p>Booked apartment <i><b>${bookedAccomodation.title}</b></i> successfully</p>
+      <ul>
+        <li>From: ${checkIn}</li>
+        <li>To: ${checkOut}</li>
+      </ul>
+      <p>Total Price is to pay is <b>₹ ${totalPrice}</b></p>
+      <hr>
+      <p>Host Details</p>
+      <ul>
+        <li>Name: ${hostInfo.name}</li>
+        <li>Email: ${hostInfo.email}</li>
+        </ul>
+      <hr>
+      <p>You can contact the owner for further assistance</p>
+    `,
+  })
+
+  const info2 = await transport.sendMail({
+    from: '"StayWise 🏢" <business@staywise.com>',
+    to: hostInfo.email,
+    subject: 'Your Accomodation is Rented',
+    html: `
+      <h1>Your Accomodation is rented Successfully by <u>${fullName}</u></h1>
+      <p>Booked apartment <i><b>${bookedAccomodation.title}</b></i> successfully</p>
+      <hr>
+      <p>Check-in, Check-out and No. of Guests
+      <ul>
+        <li>From: ${checkIn}</li>
+        <li>To: ${checkOut}</li>
+        <li>Guests: ${numGuest}</li>
+      </ul>
+      <p>Total Price to recieve is <b>₹ ${totalPrice}</b></p>
+      <hr>
+      <p>You can contact by <small>+</small>91 <u>${mobile}</u> with below details</p>
+      <ul>
+        <li>Name: <b>${user.name}</b></li>
+        <li>Email: <b>${user.email}</b></li>
+      </ul>
+    `,
+  })
+
+  console.log('Message sent: %s', info1.messageId)
+  console.log('Message sent: %s', info2.messageId)
+
   res.json(bookingDoc)
+})
+
+app.post('/cancel-booking', async (req, res) => {
+  const user = await getUserFromToken(req)
+  const { id, placeId } = req.body
+  const cancelledPlace = await PlaceModel.findByIdAndUpdate(placeId, {
+    booked: false,
+    bookedBy: null,
+  })
+  const bookedPlace = await BookingModel.findOneAndRemove({
+    place: placeId,
+    bookedUser: id,
+  })
+  const hostInfo = await UserModel.findById(cancelledPlace.owner)
+
+  const transport = nodemailer.createTransport({
+    host: 'sandbox.smtp.mailtrap.io',
+    port: 2525,
+    auth: {
+      user: '666e7dd8d7f675',
+      pass: 'b5e636d1a8c0a6',
+    },
+  })
+
+  const info1 = await transport.sendMail({
+    from: '"StayWise 🏢" <business@staywise.com>',
+    to: user.email,
+    subject: 'Accomodation cancelled Successfully',
+    html: `
+      <h1>Your booking is Cancelled</h1>
+      <p>Apartment <i><b>${cancelledPlace.title}</b></i> cancelled successfully</p>
+      <p>You can contact the owner for further to update them</p>
+      <ul>
+        <li>Name: ${hostInfo.name}</li>
+        <li>Email: ${hostInfo.email}</li>
+        </ul>
+      <hr>
+    `,
+  })
+
+  const info2 = await transport.sendMail({
+    from: '"StayWise 🏢" <business@staywise.com>',
+    to: hostInfo.email,
+    subject: 'Your Accomodation is Cancelled',
+    html: `
+      <h1>Your Accomodation is cancelled by <u>${user.name}</u></h1>
+      <p>Cancelled apartment <i><b>${cancelledPlace.title}</b></i> successfully</p>
+      <hr>
+      <p>Please enquire with renter for any issue</p>
+      <ul>
+        <li>Name: <b>${user.name}</b></li>
+        <li>Email: <b>${user.email}</b></li>
+      </ul>
+    `,
+  })
+
+  res.json({ cancelledPlace, hostInfo, user })
+})
+
+app.get('/bookings', async (req, res) => {
+  const userData = await getUserFromToken(req)
+  const foundBookings = await BookingModel.findOne({ bookedUser: userData.id })
+  const hostedUser = await PlaceModel.findById(foundBookings.place)
+
+  res.json(foundBookings)
 })
 
 app.listen(3000, () => {

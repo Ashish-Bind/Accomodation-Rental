@@ -5,9 +5,12 @@ import { usePlace } from '../context/PlacesContext'
 import { Left, Image, Map } from '../icons/Icons'
 import { differenceInCalendarDays } from 'date-fns'
 import PriceFormatter from '../components/PriceFormatter'
+import { useUser } from '../context/UserContext'
+import Loading from '../icons/Loading'
 
 function SinglePlacePage() {
   const { id } = useParams()
+  const { user } = useUser()
   const { singlePlace: place, setSinglePlace } = usePlace()
 
   let numNights = 0
@@ -15,6 +18,7 @@ function SinglePlacePage() {
 
   const [showAllPhotos, setShowAllPhotos] = useState(false)
 
+  const [loading, setLoading] = useState(false)
   const [checkIn, setCheckIn] = useState('')
   const [checkOut, setCheckOut] = useState('')
   const [numGuest, setNumGuest] = useState(1)
@@ -65,6 +69,7 @@ function SinglePlacePage() {
   }
 
   async function bookPlace() {
+    setLoading(true)
     const response = await axios.post('/booking', {
       placeId: id,
       checkIn,
@@ -76,7 +81,13 @@ function SinglePlacePage() {
     })
 
     const bookingId = response.data._id
-    setRedirect('/account')
+    setLoading(false)
+    setRedirect('/account/bookings/' + bookingId)
+  }
+
+  async function cancelBooking() {
+    axios.post('/cancel-booking', { id: user.id, placeId: id })
+    setRedirect('/')
   }
 
   if (redirect) {
@@ -99,12 +110,12 @@ function SinglePlacePage() {
         <img
           src={'http://localhost:3000/uploads/' + place.photos?.[0]}
           onClick={() => setShowAllPhotos(true)}
-          className="aspect-auto object-cover rounded-s-2xl cursor-pointer"
+          className="aspect-auto object-cover rounded-2xl cursor-pointer"
         />
         <img
           src={'http://localhost:3000/uploads/' + place.photos?.[1]}
           onClick={() => setShowAllPhotos(true)}
-          className="aspect-auto object-cover rounded-e-2xl cursor-pointer"
+          className="aspect-auto object-cover rounded-2xl cursor-pointer"
         />
         <button
           className="absolute right-4 bottom-4 px-2 py-2  rounded-md font-semibold flex items-center gap-2 text-white"
@@ -115,116 +126,140 @@ function SinglePlacePage() {
         </button>
       </div>
 
-      <div className="grid lg:grid-cols-2  grid-cols-1 gap-2 mt-4">
-        <div>
+      <div className="grid lg:grid-cols-[2fr_1fr]  grid-cols-1 gap-2 mt-4">
+        <div className="grid content-around">
           <div>
             <h2 className="font-semibold underline text-lg">Description</h2>
             <p className="text-gray-500 text-base break-all">
               {place.description}
             </p>
           </div>
-          <p>
-            <span className="font-medium text-base">Check In:</span>{' '}
-            {place.checkIn}
-          </p>
-          <p>
-            <span className="font-medium text-base">Check Out:</span>{' '}
-            {place.checkOut}
-          </p>
-          <p>
-            <span className="font-medium text-base">No of Guests:</span>{' '}
-            {place.maxGuest}
-          </p>
-        </div>
-        <div className="bg-slate-200 py-2 px-4 rounded-md shadow-lg">
-          <div className="text-center">
-            <strong>Price :</strong> <PriceFormatter price={place.price} /> per
-            night
+          <div>
+            <p>
+              <span className="font-medium text-base">Check In:</span>{' '}
+              {place.checkIn}
+            </p>
+            <p>
+              <span className="font-medium text-base">Check Out:</span>{' '}
+              {place.checkOut}
+            </p>
+            <p>
+              <span className="font-medium text-base">No of Guests:</span>{' '}
+              {place.maxGuest}
+            </p>
           </div>
-          <div className="border-gray-300 border rounded-md">
-            <div className="px-4 py-2 my-1 rounded-md flex items-center ">
-              <label htmlFor="check-in" className="font-bold">
-                Check In Date :
-              </label>
-              <input
-                type="date"
-                name=""
-                id="check-in"
-                className="bg-transparent p-2"
-                value={checkIn}
-                onChange={(e) => setCheckIn(e.target.value)}
-              />
-            </div>
-            <div className="px-4 py-2 my-1 rounded-md">
-              <label htmlFor="check-out" className="font-bold">
-                Check Out Date :
-              </label>
-              <input
-                type="date"
-                name=""
-                id="check-out"
-                className="bg-transparent p-2"
-                value={checkOut}
-                onChange={(e) => setCheckOut(e.target.value)}
-              />
-            </div>
-            <div className="px-4 py-2 my-1 rounded-md">
-              <label htmlFor="guest" className="font-bold">
-                No of Guest:
-              </label>
-              <input
-                type="number"
-                name=""
-                id="guest"
-                className="bg-transparent"
-                max={place.maxGuest}
-                value={numGuest}
-                onChange={(e) => setNumGuest(e.target.value)}
-              />
-            </div>
-            {numNights > 0 && (
+        </div>
+        {loading ? (
+          <div className="w-40 place-self-center text-primary">
+            <Loading />
+            <h1>Please do not refresh the page.</h1>
+          </div>
+        ) : (
+          <div className=" py-2 px-4 rounded-md shadow-2xl place-items-center">
+            {place.booked ? (
+              place.bookedBy === user.id ? (
+                <button
+                  className="px-2 py-1 w-full rounded-xl text-white text-base my-2"
+                  onClick={cancelBooking}
+                >
+                  Cancel Booking
+                </button>
+              ) : (
+                <div>Already booked by someone</div>
+              )
+            ) : (
               <>
-                <div className="px-4 py-2 my-1 rounded-md">
-                  <label htmlFor="guest" className="font-bold">
-                    Enter your full Name:
-                  </label>
-                  <input
-                    type="text"
-                    name=""
-                    id="guest"
-                    className="bg-transparent"
-                    value={fullName}
-                    onChange={(e) => setFullName(e.target.value)}
-                  />
+                <div className="text-center">
+                  <strong>Price :</strong>{' '}
+                  <PriceFormatter price={place.price} /> per night
                 </div>
-                <div className="px-4 py-2 my-1 rounded-md">
-                  <label htmlFor="guest" className="font-bold">
-                    Enter your Mobile Number:
-                  </label>
-                  <input
-                    type="number"
-                    name=""
-                    id="guest"
-                    className="bg-transparent"
-                    value={mobile}
-                    onChange={(e) => setMobile(e.target.value)}
-                  />
+                <div className="border-gray-300 border rounded-md">
+                  <div className="px-3 py-1 my-1 rounded-md flex items-center ">
+                    <label htmlFor="check-in" className="font-bold">
+                      Check In Date :
+                    </label>
+                    <input
+                      type="date"
+                      name=""
+                      id="check-in"
+                      className="bg-transparent p-2"
+                      value={checkIn}
+                      onChange={(e) => setCheckIn(e.target.value)}
+                    />
+                  </div>
+                  <div className="px-3 py-1 my-1 rounded-md">
+                    <label htmlFor="check-out" className="font-bold">
+                      Check Out Date :
+                    </label>
+                    <input
+                      type="date"
+                      name=""
+                      id="check-out"
+                      className="bg-transparent p-2"
+                      value={checkOut}
+                      onChange={(e) => setCheckOut(e.target.value)}
+                    />
+                  </div>
+                  <div className="px-3 py-1 my-1 rounded-md">
+                    <label htmlFor="guest" className="font-bold">
+                      No of Guest:
+                    </label>
+                    <input
+                      type="number"
+                      name=""
+                      id="guest"
+                      className="bg-transparent"
+                      max={place.maxGuest}
+                      value={numGuest}
+                      onChange={(e) => setNumGuest(e.target.value)}
+                    />
+                  </div>
+                  {numNights > 0 && (
+                    <>
+                      <div className="px-4 py-2 my-1 rounded-md">
+                        <label htmlFor="guest" className="font-bold">
+                          Enter your full Name:
+                        </label>
+                        <input
+                          type="text"
+                          name=""
+                          id="guest"
+                          className="bg-transparent"
+                          value={fullName}
+                          onChange={(e) => setFullName(e.target.value)}
+                        />
+                      </div>
+                      <div className="px-4 py-2 my-1 rounded-md">
+                        <label htmlFor="guest" className="font-bold">
+                          Enter your Mobile Number:
+                        </label>
+                        <input
+                          type="number"
+                          name=""
+                          id="guest"
+                          className="bg-transparent"
+                          value={mobile}
+                          onChange={(e) => setMobile(e.target.value)}
+                        />
+                      </div>
+                    </>
+                  )}
                 </div>
+                <button
+                  className="px-2 py-1 w-full rounded-xl text-white text-base my-2"
+                  onClick={bookPlace}
+                >
+                  Book Now
+                </button>
+                {numNights > 0 && (
+                  <span>
+                    Total price will be ₹ <PriceFormatter price={totalPrice} />
+                  </span>
+                )}
               </>
             )}
           </div>
-          <button
-            className="px-2 py-1 w-full rounded-xl text-white text-base my-2"
-            onClick={bookPlace}
-          >
-            Book Now
-          </button>
-          {numNights > 0 && (
-            <span>
-              Total price will be ₹ <PriceFormatter price={totalPrice} />
-            </span>
-          )}
-        </div>
+        )}
       </div>
       <p className="font-semibold underline text-lg">Extra Information:</p>
       <p className="text-gray-500 text-sm break-all">{place.extraInfo}</p>

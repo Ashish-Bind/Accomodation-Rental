@@ -18,6 +18,8 @@ function LoginPage() {
       setRedirect(true)
     } catch (error) {
       alert('Login failed, Please try again!')
+      setEmail('')
+      setPassword('')
     }
   }
 

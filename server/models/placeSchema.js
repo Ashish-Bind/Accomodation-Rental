@@ -12,6 +12,8 @@ const placeSchema = new Schema({
   checkOut: Number,
   maxGuest: Number,
   price: Number,
+  booked: { type: Boolean, default: false },
+  bookedBy: { type: Schema.Types.ObjectId },
 })
 
 const PlaceModel = model('place', placeSchema)

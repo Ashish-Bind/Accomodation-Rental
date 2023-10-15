@@ -13,11 +13,11 @@ function LoginPage() {
     e.preventDefault()
     try {
       const res = await axios.post('/login', { email, password })
-      alert('Login Successful!')
       setUser(res.data)
+      alert('Login Successful!')
       setRedirect(true)
-    } catch (error) {
-      alert('Login failed, Please try again!')
+    } catch ({ response }) {
+      alert(response.data)
       setEmail('')
       setPassword('')
     }

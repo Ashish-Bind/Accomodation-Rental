@@ -42,7 +42,7 @@ function SingleBookingPage() {
 
   return (
     <div className="mt-8 lg:mx-20 mx-6">
-      <h1 className="text-2xl">{singleBooking.place.title}</h1>
+      <h1 className="text-3xl">{singleBooking.place.title}</h1>
       <a
         className="font-semibold underline flex gap-1 auto-rows-min text-base"
         href={'https://maps.google.com/?q=' + singleBooking.place.address}
@@ -71,23 +71,21 @@ function SingleBookingPage() {
         </div>
       </div>
       <div className="flex flex-col justify-between border border-gray-400 rounded-lg p-2 gap-3 my-2">
-        <h2 className="text-xl font-light underline text-gray-600">
-          Booking Information
-        </h2>
+        <h2 className="text-md font-bold text-gray-600">Booking Information</h2>
 
         <div className="flex gap-2">
-          <p className="text-sm flex items-center">
+          <p className="text-sm flex items-center gap-1">
             <Calender />
-            <span className="font-semibold ">
+            <span className="font-medium ">
               {format(new Date(singleBooking.checkIn), 'dd-MM-yyy')}
             </span>
           </p>
           <p>
             <RightArrow />
           </p>
-          <p className="text-sm flex items-center">
+          <p className="text-sm flex items-center gap-1">
             <Calender />
-            <span className="font-semibold">
+            <span className="font-medium">
               {format(new Date(singleBooking.checkOut), 'dd-MM-yyy')}
             </span>
           </p>
@@ -95,7 +93,7 @@ function SingleBookingPage() {
 
         <p className="flex gap-2">
           <Moon />
-          <span className="font-semibold">
+          <span className="font-medium">
             {differenceInCalendarDays(
               new Date(singleBooking.checkOut),
               new Date(singleBooking.checkIn)
@@ -111,7 +109,7 @@ function SingleBookingPage() {
             <Loading color={'#fff'} />
           </div>
         ) : (
-          <div className="my-2mx-auto">Cancel Booking</div>
+          <div className="my-2">Cancel Booking</div>
         )}
       </button>
     </div>

@@ -2,11 +2,21 @@ import axios from 'axios'
 import { useEffect, useState } from 'react'
 import { Navigate, useParams } from 'react-router-dom'
 import { usePlace } from '../context/PlacesContext'
-import { Left, Image, Map } from '../icons/Icons'
+import { Left, Image, Map, Host } from '../icons/Icons'
 import { differenceInCalendarDays } from 'date-fns'
 import PriceFormatter from '../components/PriceFormatter'
 import { useUser } from '../context/UserContext'
 import Loading from '../icons/Loading'
+import {
+  Garden,
+  Kitchen,
+  Long,
+  Parking,
+  Pets,
+  Private,
+  TV,
+  Wifi,
+} from '../icons/PerksIcons'
 
 function SinglePlacePage() {
   const { id } = useParams()
@@ -106,6 +116,119 @@ function SinglePlacePage() {
     setRedirect('/account/bookings')
   }
 
+  function checkPlace(placeInfo, id = undefined) {
+    if (placeInfo.booked && placeInfo.bookedBy === id) {
+      return (
+        <button
+          className="px-2 py-1 w-full rounded-xl text-white text-base my-2"
+          onClick={cancelBooking}
+        >
+          Cancel Booking
+        </button>
+      )
+    } else if (placeInfo?.owner?._id === id) {
+      return (
+        <div className="text-primary font-bold text-center">
+          You are the owner of this Accommodation
+        </div>
+      )
+    } else if (placeInfo.booked) {
+      return <div>Already booked by someone</div>
+    } else {
+      return (
+        <>
+          <div className="text-center">
+            <strong>Price :</strong> <PriceFormatter price={place.price} /> per
+            night
+          </div>
+          <div className="border-gray-300 border rounded-md">
+            <div className="px-3 py-1 my-1 rounded-md flex items-center ">
+              <label htmlFor="check-in" className="font-bold">
+                Check In Date :
+              </label>
+              <input
+                type="date"
+                name=""
+                id="check-in"
+                className="bg-transparent p-2"
+                value={checkIn}
+                onChange={(e) => setCheckIn(e.target.value)}
+              />
+            </div>
+            <div className="px-3 py-1 my-1 rounded-md">
+              <label htmlFor="check-out" className="font-bold">
+                Check Out Date :
+              </label>
+              <input
+                type="date"
+                name=""
+                id="check-out"
+                className="bg-transparent p-2"
+                value={checkOut}
+                onChange={(e) => setCheckOut(e.target.value)}
+              />
+            </div>
+            <div className="px-3 py-1 my-1 rounded-md">
+              <label htmlFor="guest" className="font-bold">
+                No of Guest:
+              </label>
+              <input
+                type="number"
+                name=""
+                id="guest"
+                className="bg-transparent"
+                max={place.maxGuest}
+                value={numGuest}
+                onChange={(e) => setNumGuest(e.target.value)}
+              />
+            </div>
+            {numNights > 0 && (
+              <>
+                <div className="px-4 py-2 my-1 rounded-md">
+                  <label htmlFor="guest" className="font-bold">
+                    Enter your full Name:
+                  </label>
+                  <input
+                    type="text"
+                    name=""
+                    id="guest"
+                    className="bg-transparent"
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
+                  />
+                </div>
+                <div className="px-4 py-2 my-1 rounded-md">
+                  <label htmlFor="guest" className="font-bold">
+                    Enter your Mobile Number:
+                  </label>
+                  <input
+                    type="number"
+                    name=""
+                    id="guest"
+                    className="bg-transparent"
+                    value={mobile}
+                    onChange={(e) => setMobile(e.target.value)}
+                  />
+                </div>
+              </>
+            )}
+          </div>
+          <button
+            className="px-2 py-1 w-full rounded-xl text-white text-base my-2"
+            onClick={bookPlace}
+          >
+            Book Now
+          </button>
+          {numNights > 0 && (
+            <span>
+              Total price will be ₹ <PriceFormatter price={totalPrice} />
+            </span>
+          )}
+        </>
+      )
+    }
+  }
+
   if (redirect) {
     return <Navigate to={redirect} />
   }
@@ -178,117 +301,90 @@ function SinglePlacePage() {
           </div>
         ) : (
           <div className=" py-2 px-4 rounded-md border border-gray-300 place-items-center">
-            {place.booked ? (
-              place.bookedBy === user?.id ? (
-                <button
-                  className="px-2 py-1 w-full rounded-xl text-white text-base my-2"
-                  onClick={cancelBooking}
-                >
-                  Cancel Booking
-                </button>
-              ) : (
-                <div>Already booked by someone</div>
-              )
-            ) : user?.id === place.owner ? (
-              <div className="text-primary font-bold text-center">
-                You are the owner of this Accommodation
-              </div>
-            ) : (
-              <>
-                <div className="text-center">
-                  <strong>Price :</strong>{' '}
-                  <PriceFormatter price={place.price} /> per night
-                </div>
-                <div className="border-gray-300 border rounded-md">
-                  <div className="px-3 py-1 my-1 rounded-md flex items-center ">
-                    <label htmlFor="check-in" className="font-bold">
-                      Check In Date :
-                    </label>
-                    <input
-                      type="date"
-                      name=""
-                      id="check-in"
-                      className="bg-transparent p-2"
-                      value={checkIn}
-                      onChange={(e) => setCheckIn(e.target.value)}
-                    />
-                  </div>
-                  <div className="px-3 py-1 my-1 rounded-md">
-                    <label htmlFor="check-out" className="font-bold">
-                      Check Out Date :
-                    </label>
-                    <input
-                      type="date"
-                      name=""
-                      id="check-out"
-                      className="bg-transparent p-2"
-                      value={checkOut}
-                      onChange={(e) => setCheckOut(e.target.value)}
-                    />
-                  </div>
-                  <div className="px-3 py-1 my-1 rounded-md">
-                    <label htmlFor="guest" className="font-bold">
-                      No of Guest:
-                    </label>
-                    <input
-                      type="number"
-                      name=""
-                      id="guest"
-                      className="bg-transparent"
-                      max={place.maxGuest}
-                      value={numGuest}
-                      onChange={(e) => setNumGuest(e.target.value)}
-                    />
-                  </div>
-                  {numNights > 0 && (
-                    <>
-                      <div className="px-4 py-2 my-1 rounded-md">
-                        <label htmlFor="guest" className="font-bold">
-                          Enter your full Name:
-                        </label>
-                        <input
-                          type="text"
-                          name=""
-                          id="guest"
-                          className="bg-transparent"
-                          value={fullName}
-                          onChange={(e) => setFullName(e.target.value)}
-                        />
-                      </div>
-                      <div className="px-4 py-2 my-1 rounded-md">
-                        <label htmlFor="guest" className="font-bold">
-                          Enter your Mobile Number:
-                        </label>
-                        <input
-                          type="number"
-                          name=""
-                          id="guest"
-                          className="bg-transparent"
-                          value={mobile}
-                          onChange={(e) => setMobile(e.target.value)}
-                        />
-                      </div>
-                    </>
-                  )}
-                </div>
-                <button
-                  className="px-2 py-1 w-full rounded-xl text-white text-base my-2"
-                  onClick={bookPlace}
-                >
-                  Book Now
-                </button>
-                {numNights > 0 && (
-                  <span>
-                    Total price will be ₹ <PriceFormatter price={totalPrice} />
-                  </span>
-                )}
-              </>
-            )}
+            {checkPlace(place, user?.id)}
           </div>
         )}
       </div>
       <p className="font-semibold underline text-lg">Extra Information:</p>
       <p className="text-gray-400 text-base break-all">{place.extraInfo}</p>
+      <div className="grid lg:grid-cols-[70%_30%] gap-2 grid-rows-[1fr]">
+        <div>
+          <p className="font-semibold underline text-lg">Perks:</p>
+          <div className="grid lg:grid-cols-2 gap-2">
+            {place?.perks?.map((perk) => {
+              return (
+                <span
+                  key={perk}
+                  className="border border-gray-300 py-2 px-4 rounded-md"
+                >
+                  {perk === 'wifi' && (
+                    <span className="flex text-center gap-2">
+                      <Wifi />
+                      <p>Free Wifi</p>
+                    </span>
+                  )}
+                  {perk === 'parking' && (
+                    <span className="flex text-center gap-2">
+                      <Parking />
+                      <p>Parking Spot</p>
+                    </span>
+                  )}
+                  {perk === 'tv' && (
+                    <span className="flex text-center gap-2">
+                      <TV />
+                      <p>TV</p>
+                    </span>
+                  )}
+                  {perk === 'pets' && (
+                    <span className="flex text-center gap-2">
+                      <Pets />
+                      <p>Pets Allowed</p>
+                    </span>
+                  )}
+                  {perk === 'private' && (
+                    <span className="flex text-center gap-2">
+                      <Private />
+                      <p>Private Entrance</p>
+                    </span>
+                  )}
+                  {perk === 'long' && (
+                    <span className="flex text-center gap-2">
+                      <Long />
+                      <p>Long Stay</p>
+                    </span>
+                  )}
+                  {perk === 'kitchen' && (
+                    <span className="flex text-center gap-2">
+                      <Kitchen />
+                      <p>Kitchen</p>
+                    </span>
+                  )}
+                  {perk === 'garden' && (
+                    <span className="flex text-center gap-2">
+                      <Garden />
+                      <p>Garden Access</p>
+                    </span>
+                  )}
+                </span>
+              )
+            })}
+          </div>
+        </div>
+        <div>
+          <p className="font-semibold underline text-lg">Host Information:</p>
+          <div className="border border-gray-300 py-2 px-4 rounded-md text-center h-5/6 grid">
+            <div className="flex justify-center">
+              <Host dimension={8} />
+            </div>
+            <p>
+              Name: <span className="font-medium">{place?.owner?.name}</span>
+            </p>
+            <p>
+              Email: <span className="font-medium">{place?.owner?.email}</span>
+            </p>
+          </div>
+        </div>
+      </div>
     </div>
   )
 }

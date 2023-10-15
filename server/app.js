@@ -78,10 +78,10 @@ app.post('/login', async (req, res) => {
         }
       )
     } else {
-      throw new Error('Wrong Password')
+      res.status(422).json('Incorrect Password')
     }
   } else {
-    throw new Error('No user found')
+    res.status(404).json('No User Found')
   }
 })
 
@@ -203,7 +203,10 @@ app.get('/all-places', async (req, res) => {
 
 app.get('/single-place/:id', async (req, res) => {
   const { id } = req.params
-  const foundPlace = await PlaceModel.findById(id)
+  const foundPlace = await PlaceModel.findById(id).populate(
+    'owner',
+    '-password'
+  )
   res.json(foundPlace)
 })
 

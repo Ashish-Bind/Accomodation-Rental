@@ -40,6 +40,33 @@ function SingleBookingPage() {
     return <h1>Loading...</h1>
   }
 
+  const checkExpiry = () => {
+    if (
+      differenceInCalendarDays(new Date(singleBooking.checkIn), Date.now()) < 0
+    ) {
+      return (
+        <div className="my-2 flex rounded-md p-2 font-semibold border border-gray-300 w-full justify-center">
+          Previously Booked
+        </div>
+      )
+    } else {
+      return (
+        <button
+          className="text-white w-full rounded-lg"
+          onClick={cancelBooking}
+        >
+          {loading ? (
+            <div className="w-14 mx-auto">
+              <Loading color={'#fff'} />
+            </div>
+          ) : (
+            <div className="my-2">Cancel Booking</div>
+          )}
+        </button>
+      )
+    }
+  }
+
   return (
     <div className="mt-8 lg:mx-20 mx-6">
       <h1 className="text-3xl">{singleBooking.place.title}</h1>
@@ -102,16 +129,9 @@ function SingleBookingPage() {
           nights | <Money />
           <PriceFormatter price={singleBooking.totalPrice} />
         </p>
+
+        {checkExpiry()}
       </div>
-      <button className="text-white w-full rounded-lg" onClick={cancelBooking}>
-        {loading ? (
-          <div className="w-14 mx-auto">
-            <Loading color={'#fff'} />
-          </div>
-        ) : (
-          <div className="my-2">Cancel Booking</div>
-        )}
-      </button>
     </div>
   )
 }

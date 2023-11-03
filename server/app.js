@@ -11,13 +11,21 @@ import UserModel from './models/userSchema.js'
 import PlaceModel from './models/placeSchema.js'
 import BookingModel from './models/bookingSchema.js'
 import { fileURLToPath } from 'url'
-import { dirname, resolve } from 'path'
+import { dirname } from 'path'
 import multer from 'multer'
 import { renameSync } from 'fs'
 import bookingModel from './models/bookingSchema.js'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
+const transport = nodemailer.createTransport({
+  host: 'sandbox.smtp.mailtrap.io',
+  port: 2525,
+  auth: {
+    user: '666e7dd8d7f675',
+    pass: 'b5e636d1a8c0a6',
+  },
+})
 
 dotenv.config()
 
@@ -312,15 +320,6 @@ app.post('/cancel-booking', async (req, res) => {
   })
   const hostInfo = await UserModel.findById(cancelledPlace.owner)
 
-  const transport = nodemailer.createTransport({
-    host: 'sandbox.smtp.mailtrap.io',
-    port: 2525,
-    auth: {
-      user: '666e7dd8d7f675',
-      pass: 'b5e636d1a8c0a6',
-    },
-  })
-
   const info1 = await transport.sendMail({
     from: '"StayWise 🏢" <business@staywise.com>',
     to: user.email,
@@ -380,15 +379,6 @@ app.post('/cancel-booking/single', async (req, res) => {
   })
   const hostInfo = await UserModel.findById(cancelledPlace.owner)
 
-  const transport = nodemailer.createTransport({
-    host: 'sandbox.smtp.mailtrap.io',
-    port: 2525,
-    auth: {
-      user: '666e7dd8d7f675',
-      pass: 'b5e636d1a8c0a6',
-    },
-  })
-
   const info1 = await transport.sendMail({
     from: '"StayWise 🏢" <business@staywise.com>',
     to: user.email,
@@ -417,6 +407,7 @@ app.post('/cancel-booking/single', async (req, res) => {
       <ul>
         <li>Name: <b>${user.name}</b></li>
         <li>Email: <b>${user.email}</b></li>
+        
       </ul>
     `,
   })

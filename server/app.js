@@ -22,8 +22,8 @@ const transport = nodemailer.createTransport({
   host: 'sandbox.smtp.mailtrap.io',
   port: 2525,
   auth: {
-    user: '666e7dd8d7f675',
-    pass: 'b5e636d1a8c0a6',
+    user: process.env.NODEMAILER_USER,
+    pass: process.env.NODEMAILER_PASS,
   },
 })
 
@@ -31,7 +31,7 @@ dotenv.config()
 
 const app = express()
 const bcryptSalt = bcrypt.genSaltSync(10)
-const jwtSecret = 'asfhxi1o2j2dsgnk24jaj7dfs12'
+const jwtSecret = process.env.JWT_SECRET
 function getUserFromToken(req) {
   return new Promise((resolve, reject) => {
     jwt.verify(req.cookies.token, jwtSecret, async (err, userData) => {

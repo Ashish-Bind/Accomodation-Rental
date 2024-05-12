@@ -15,6 +15,7 @@ import { dirname } from 'path'
 import multer from 'multer'
 import { renameSync } from 'fs'
 import bookingModel from './models/bookingSchema.js'
+import morgan from 'morgan'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
@@ -44,11 +45,12 @@ function getUserFromToken(req) {
 app.use(express.urlencoded({ extended: true }))
 app.use('/uploads', express.static(__dirname + '/uploads'))
 app.use(express.json())
+app.use(morgan('dev'))
 app.use(cookieParser())
 app.use(
   cors({
     credentials: true,
-    origin: 'http://localhost:5173',
+    origin: '*',
   })
 )
 

@@ -12,6 +12,7 @@ client/node_modules
 client/.eslintrc.cjs
 server/node_modules
 server/uploads
+server/.env
 dist
 dist-ssr
 *.local

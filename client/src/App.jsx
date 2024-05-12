@@ -13,7 +13,7 @@ import SinglePlacePage from './pages/SinglePlacePage'
 import BookingPage from './pages/BookingPage'
 import SingleBookingPage from './pages/SingleBookingPage'
 
-axios.defaults.baseURL = 'http://localhost:3000'
+axios.defaults.baseURL = 'https://accomodation-rental.onrender.com'
 axios.defaults.withCredentials = true
 
 function App() {
